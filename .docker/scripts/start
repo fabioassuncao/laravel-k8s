@@ -1,0 +1,50 @@
+#!/bin/bash
+
+function changePermissions() {
+    echo "-----> Changing permissions.."
+    chown -R :www-data /var/www/html/storage/app
+    chown -R :www-data /var/www/html/storage/logs
+    chown -R :www-data /var/www/html/bootstrap/cache
+    find /var/www/html/storage/ -type f -exec chmod 664 {} \;
+    find /var/www/html/storage/ -type d -exec chmod 775 {} \;
+    find /var/www/html/bootstrap/cache/ -type f -exec chmod 664 {} \;
+    find /var/www/html/bootstrap/cache/ -type d -exec chmod 775 {} \;
+}
+
+function migrateDatabase() {
+    echo "-----> Migrating database.."
+    gosu www-data php artisan migrate --force || true
+}
+
+function linkStorage() {
+    gosu www-data php artisan storage:link || true
+}
+
+function optimize() {
+    # gosu www-data composer dump-autoload -o
+    gosu www-data php artisan config:cache || true
+    # gosu www-data php artisan route:cache || true
+    # gosu www-data php artisan view:cache || true
+}
+
+if [ "$ENABLE_XDEBUG" == "yes" ]; then
+    echo "-----> Enabling xdebug.."
+    docker-php-ext-enable xdebug
+fi
+
+# Start supervisord and services
+echo "-----> Info: Launching supervisord.."
+if [ $# -gt 0 ]; then
+    exec gosu www-data "$@"
+else
+    if [ -d "/var/www/html/vendor" ] ; then
+        changePermissions
+        optimize
+        linkStorage
+        # migrateDatabase
+    else
+        echo "-----> Warning: Directory /var/www/html/vendor does not yet exist"
+    fi
+
+    exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi
