@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->command('test:task')->everyMinute();
+        $schedule->command('process:textfile')->everyMinute();
     }
 
     /**

@@ -6,15 +6,18 @@ This project is a simple demo. I chose to use FrankenPHP with an app server, but
 
 ## Included Items
 
-* PHP 8.3
+* [PHP 8.3](https://www.php.net/releases/8.3/pt_BR.php)
 * [Laravel](https://laravel.com/)
 * [Laravel Octane](https://laravel.com/docs/10.x/octane)
+* [Laravel horizon](https://laravel.com/docs/10.x/horizon)
 * [Laravel Filament](https://filamentphp.com/)
 * [FrankenPHP](https://frankenphp.dev/)
 * [AKS](https://azure.microsoft.com/pt-br/products/kubernetes-service)
 * [DOKS](https://www.digitalocean.com/products/kubernetes)
 
-![Filament Demo](./screenshot.png)
+![Filament Demo](./screenshot-1.png)
+
+![Laravel Horizon](./screenshot-2.png)
 
 ## Upcoming Meetings
 

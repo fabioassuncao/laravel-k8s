@@ -48,6 +48,16 @@ return [
     */
 
     'channels' => [
+        'stdout' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => StreamHandler::class,
+            'formatter' => env('LOG_STDOUT_FORMATTER'),
+            'with' => [
+                'stream' => 'php://stdout',
+            ],
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['daily', 'flare'],

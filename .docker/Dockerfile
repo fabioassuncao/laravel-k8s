@@ -33,7 +33,8 @@ RUN apk add --no-cache php83 \
     php83-intl \
     php83-exif \
     php83-pcntl \
-    php83-sockets
+    php83-sockets \
+    php83-posix
 
 RUN ln -s /usr/bin/php83 /usr/bin/php
 
@@ -50,5 +51,8 @@ COPY . /var/www/html
 RUN composer install --no-dev
 RUN chown -R nobody:nobody /var/www/html/storage
 
+COPY ./.docker/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/entrypoint
+
 EXPOSE 8000
-ENTRYPOINT ["php", "-d", "variables_order=EGPCS", "artisan", "octane:start", "--server=frankenphp", "--host=0.0.0.0", "--port=8000"]
+ENTRYPOINT ["/usr/local/bin/entrypoint"]
