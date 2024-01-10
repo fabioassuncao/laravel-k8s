@@ -95,7 +95,8 @@ jobs:
     steps:
       - name: Deploy on K8s
         id: deploy
+        env:
+          VERSION: ${{ needs.bump-version.outputs.VERSION }}
         run: |
-          COMMIT_NUMBER=$(git rev-parse --short ${{ github.sha }})
-          echo "Work in progress."
-          echo "For now, settle for the last commit's ID: $COMMIT_NUMBER"
+          echo "Work in progress 🚀"
+          echo "For now, settle for the version ID: $VERSION"
