@@ -91,7 +91,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [docker-ci]
+    needs: [bump-version, docker-ci]
     steps:
       - name: Deploy on K8s
         id: deploy
