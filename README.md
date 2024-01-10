@@ -1,4 +1,4 @@
-# Laravel k8s
+# Laravel Filament + k8s
 
 Project demo for my Laravel and Kubernetes workshop with deployment on Azure Kubernetes Service and DigitalOcean Kubernetes.
 
@@ -9,9 +9,12 @@ This project is a simple demo. I chose to use FrankenPHP with an app server, but
 * PHP 8.3
 * [Laravel](https://laravel.com/)
 * [Laravel Octane](https://laravel.com/docs/10.x/octane)
+* [Laravel Filament](https://filamentphp.com/)
 * [FrankenPHP](https://frankenphp.dev/)
 * [AKS](https://azure.microsoft.com/pt-br/products/kubernetes-service)
 * [DOKS](https://www.digitalocean.com/products/kubernetes)
+
+![Filament Demo](./screenshot.png)
 
 ## Upcoming Meetings
 

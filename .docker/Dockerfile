@@ -1,35 +1,54 @@
-FROM php:8.3-alpine
+FROM alpine:latest
 
-LABEL maintainer="Fábio Assunção <fabio23gt@gmail.com>"
+WORKDIR /var/www/html/
 
-# Install necessary tools
-RUN apk --no-cache add \
-    bash \
-    curl \
-    libzip-dev \
-    unzip
+# Essentials
+RUN echo "UTC" > /etc/timezone
+RUN apk add --no-cache zip unzip curl sqlite bash && \
+    sed -i 's/bin\/ash/bin\/bash/g' /etc/passwd
 
-# Install php-extension-installer
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+# Installing PHP
+RUN apk add --no-cache php83 \
+    php83-common \
+    php83-pdo \
+    php83-opcache \
+    php83-zip \
+    php83-phar \
+    php83-iconv \
+    php83-cli \
+    php83-curl \
+    php83-openssl \
+    php83-mbstring \
+    php83-tokenizer \
+    php83-fileinfo \
+    php83-json \
+    php83-xml \
+    php83-xmlwriter \
+    php83-simplexml \
+    php83-dom \
+    php83-pdo_mysql \
+    php83-pdo_sqlite \
+    php83-tokenizer \
+    php83-pecl-redis \
+    php83-intl \
+    php83-exif \
+    php83-pcntl \
+    php83-sockets
+
+RUN ln -s /usr/bin/php83 /usr/bin/php
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
-
-# Install required PHP extensions
-RUN install-php-extensions pcntl sockets
-
-# Set the working directory
-WORKDIR /var/www
-
-# Copy application files
-COPY . /var/www
 
 # Download and set up FrankenPHP
 ADD https://github.com/dunglas/frankenphp/releases/latest/download/frankenphp-linux-x86_64 /usr/local/bin/frankenphp
 RUN chmod +x /usr/local/bin/frankenphp
 
-# Install Composer dependencies
-RUN composer install --no-dev
+# Building process
+COPY . /var/www/html
 
-# Entrypoint command
-ENTRYPOINT ["php", "artisan", "octane:start", "--server=frankenphp", "--port=8000", "--workers=16", "--host=0.0.0.0"]
+RUN composer install --no-dev
+RUN chown -R nobody:nobody /var/www/html/storage
+
+EXPOSE 8000
+ENTRYPOINT ["php", "-d", "variables_order=EGPCS", "artisan", "octane:start", "--server=frankenphp", "--host=0.0.0.0", "--port=8000"]

@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: .docker/Dockerfile
-    restart: unless-stopped
+    restart: always
     depends_on:
       - mysql
       - redis
@@ -14,8 +14,8 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     volumes:
-      - .:/var/www
-      - ./storage:/var/www/storage
+      - .:/var/www/html
+      - ./storage:/var/www/html/storage
     ports:
       - "8000:8000"
     networks:
@@ -23,7 +23,7 @@ services:
 
   mysql:
     image: mysql/mysql-server:8.0
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}"]
       retries: 3
@@ -35,16 +35,16 @@ services:
       MYSQL_DATABASE: '${DB_DATABASE}'
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     volumes:
-      - ./.docker/storage/mysql:/var/lib/mysql
+      - ./.docker/volumes/mysql:/var/lib/mysql
     networks:
       - laravel
 
   redis:
     image: redis:latest
-    restart: unless-stopped
+    restart: always
     command: --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
-      - ./.docker/storage/redis:/data
+      - ./.docker/volumes/redis:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -59,7 +59,7 @@ services:
 
   mailpit:
     image: axllent/mailpit:latest
-    restart: unless-stopped
+    restart: always
     ports:
       - '1025:1025'
       - '8025:8025'
