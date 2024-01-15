@@ -20,7 +20,7 @@ run_setup_tasks() {
 # Check if vendor directory exists
 while [ ! -d "/var/www/html/vendor" ]; do
     echo "WARNING: Directory /var/www/html/vendor does not yet exist."
-    sleep 60s
+    sleep 120s
 done
 
 # Run setup tasks if in automatic mode
