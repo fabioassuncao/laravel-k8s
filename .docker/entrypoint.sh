@@ -46,5 +46,8 @@ if [ -d "/var/www/html/vendor" ]; then
             ;;
     esac
 else
-    echo "WARNING: Directory /var/www/html/vendor does not yet exist."
+    while true; do
+        echo "WARNING: Directory /var/www/html/vendor does not yet exist."
+        sleep 60s
+    done
 fi
