@@ -19,8 +19,9 @@ run_setup_tasks() {
 
 # Check if vendor directory exists
 while [ ! -d "/var/www/html/vendor" ]; do
-    echo "WARNING: Directory /var/www/html/vendor does not yet exist."
-    sleep 120s
+    echo "WARNING: The directory /var/www/html/vendor does not exist yet. Please run the \"composer install\" command to ensure that all necessary dependencies are properly installed."
+    echo "Retrying in 180 seconds..."
+    sleep 180s
 done
 
 # Run setup tasks if in automatic mode
