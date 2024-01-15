@@ -10,6 +10,7 @@ RUN apk add --no-cache zip unzip curl sqlite bash && \
 # Installing PHP
 RUN apk add --no-cache php83 \
     php83-common \
+    php83-gd \
     php83-pdo \
     php83-opcache \
     php83-zip \
