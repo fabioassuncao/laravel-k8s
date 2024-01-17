@@ -1,0 +1,88 @@
+# Create Redis Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redis-ns
+---
+# Create Resource Quota for redis-ns Namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: redis-ns-rq
+spec:
+  hard:
+    requests.cpu: "500m"
+    requests.memory: 1Gi
+    limits.cpu: "1000m"
+    limits.memory: 2Gi
+---
+# Create Storage Class with Azure Disk to Azure Kubernetes Service
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: redis-sc-azuredisk
+provisioner: disk.csi.azure.com
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+---
+# Create Redis to Azure Kubernetes Service
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pv-claim
+  namespace: redis-ns
+spec:
+  storageClassName: redis-sc-azuredisk
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: redis-ns
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7.2
+        command: ["redis-server", "--appendonly", "yes"]
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: redis-persistent-storage
+          mountPath: /data
+      volumes:
+      - name: redis-persistent-storage
+        persistentVolumeClaim:
+          claimName: redis-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: redis-ns
+spec:
+  ports:
+  - port: 6379
+  type: ClusterIP
+  selector:
+    app: redis
