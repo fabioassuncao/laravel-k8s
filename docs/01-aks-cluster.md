@@ -99,7 +99,13 @@ az acr repository list \
 ```
 
 ### Deploy Ingress Controller
-...
+In this example, we will use the Ingress-Nginx Controller. Without too many details, the installation process is quite simple; just follow the recommendations from the official documentation.
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
+```
+
+If you want to learn more, access the [official documentation](https://kubernetes.github.io/ingress-nginx/deploy/).
 
 ### Deploy App
 ...
