@@ -6,6 +6,7 @@ To streamline the process, I've chosen to create the cluster using the [Azure CL
 
 ```bash
 # Cluster Settings
+# These variables will be used to create the resources. Feel free to modify them according to your needs.
 REGION_NAME=brazilsouth
 RESOURCE_GROUP=training-rg
 SUBNET_NAME=training-aks-subnet
@@ -42,6 +43,7 @@ SUBNET_ID=$(az network vnet subnet show \
     --query id -o tsv)
 
 # Creates a AKS cluster
+# For reasons unknown, there might be a failure in the cluster creation. I recommend waiting for 2 minutes and trying again. This approach worked for me! 😄
 az aks create \
     --resource-group $RESOURCE_GROUP \
     --name $AKS_CLUSTER_NAME \
@@ -90,6 +92,7 @@ az aks update \
 ```
 
 ### Build and push docker image in ACR
+Optionally, you can build a Docker image of your service using the az acr command, which will handle the build and push to the Azure Container Registry. Of course, you can also use any container registry. Learn more in the [official documentation](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
 
 ```bash
 az acr build \
@@ -123,7 +126,7 @@ If you want to learn more, access the [official documentation](https://cert-mana
 Now that you have deployed cert-manager, it's time to configure it to issue your SSL certificates with Let's Encrypt. To do this, create the `cluster-issuer.yaml` file:
 
 ```yaml
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt
@@ -154,7 +157,7 @@ Now that you have set up your cluster with the Nginx Ingress Controller and cert
 > Don't forget to obtain the IP address of your Load Balancer. To do this, use the command `kubectl get svc` and look for the service with the name `ingress-nginx-controller`. Note that in the "EXTERNAL IP" column, you will find the IP address. With the IP of your Load Balancer in mind, simply configure your DNS settings to point your domain or subdomain to the respective IP.
 
 ```yaml
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-host
