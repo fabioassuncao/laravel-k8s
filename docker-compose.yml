@@ -5,7 +5,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: .docker/Dockerfile
+      dockerfile: docker/Dockerfile
     restart: always
     depends_on:
       - mysql
@@ -27,7 +27,7 @@ services:
   horizon:
     build:
       context: .
-      dockerfile: .docker/Dockerfile
+      dockerfile: docker/Dockerfile
     restart: always
     depends_on:
       - app
@@ -42,7 +42,7 @@ services:
   scheduler:
     build:
       context: .
-      dockerfile: .docker/Dockerfile
+      dockerfile: docker/Dockerfile
     restart: always
     depends_on:
       - app
@@ -71,7 +71,7 @@ services:
       MYSQL_PASSWORD: '${DB_PASSWORD}'
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     volumes:
-      - ./.docker/volumes/mysql:/var/lib/mysql
+      - ./docker/volumes/mysql:/var/lib/mysql
     networks:
       - laravel
 
@@ -80,7 +80,7 @@ services:
     restart: always
     command: --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
-      - ./.docker/volumes/redis:/data
+      - ./docker/volumes/redis:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s

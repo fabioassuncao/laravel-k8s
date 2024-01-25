@@ -52,7 +52,7 @@ COPY . /var/www/html
 RUN composer install
 RUN chown -R nobody:nobody /var/www/html/storage
 
-COPY ./.docker/entrypoint.sh /usr/local/bin/entrypoint
+COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
 
 EXPOSE 8000

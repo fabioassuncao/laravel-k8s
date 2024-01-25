@@ -19,5 +19,5 @@ yarn-error.log
 frankenphp
 frankenphp-worker.php
 
-.docker/volumes/mysql
-.docker/volumes/redis
+docker/volumes/mysql
+docker/volumes/redis
