@@ -162,7 +162,7 @@ kind: Ingress
 metadata:
   name: ingress-host
   annotations:
-    spec.ingressClassName: "nginx"
+    kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt"
     ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
