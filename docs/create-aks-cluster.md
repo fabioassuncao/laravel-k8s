@@ -162,10 +162,10 @@ kind: Ingress
 metadata:
   name: ingress-host
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt"
     ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
+  ingressClassName: nginx
   rules:
   - host: "domain-or-subdomain-herer.com" # Don't forget to change it to a valid domain or subdomain
     http:
