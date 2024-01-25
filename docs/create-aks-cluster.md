@@ -161,7 +161,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-host
-  namespace: cartoriosmaranhao-develop
   annotations:
     spec.ingressClassName: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt"
@@ -175,7 +174,7 @@ spec:
         path: "/"
         backend:
           service:
-            name: cartoriosmaranhao-develop # Don't forget to enter the correct service name here
+            name: your-service-name # Don't forget to enter the correct service name here
             port:
               number: 80 # Don't forget to enter the port on which your service is available
   tls:
