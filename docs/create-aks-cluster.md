@@ -161,8 +161,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-host
+  namespace: cartoriosmaranhao-develop
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    spec.ingressClassName: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt"
     ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
@@ -173,11 +174,12 @@ spec:
       - pathType: Prefix
         path: "/"
         backend:
-          serviceName: your-service-name # Don't forget to enter the correct service name here
-          servicePort: 80 # Don't forget to enter the port on which your service is available
+          service:
+            name: cartoriosmaranhao-develop # Don't forget to enter the correct service name here
+            port:
+              number: 80 # Don't forget to enter the port on which your service is available
   tls:
   - hosts:
     - "domain-or-subdomain-herer.com" # Don't forget to change it to a valid domain or subdomain
     secretName: letsencrypt-tls
- 
 ```
