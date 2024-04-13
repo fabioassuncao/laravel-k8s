@@ -12,12 +12,16 @@ RESOURCE_GROUP=training-rg
 SUBNET_NAME=training-aks-subnet
 VNET_NAME=training-aks-vnet
 AKS_CLUSTER_NAME=training-aks
-K8S_VERSION=1.28
+AKS_K8S_VERSION=1.28
 ACR_NAME=acrtrainingaks$RANDOM
-CONTAINER_TAG=project-training-aks:v1.0.0
 CONTAINER_REGISTRY=$ACR_NAME.azurecr.io
-APP_NAMESPACE=project-training-ns
 AKS_TAGS='project=training'
+
+REDIS_NAME_SERVER='trainingredisdemoserver'
+MYSQL_NAME_SERVER='trainingmysqldemoserver'
+MYSQL_ADMIN_USER='admin-user'
+MYSQL_ADMIN_PASSWORD='M&P@Ssw0rd(x)&%321'
+
 
 # Log in using Azure CLI
 az login
@@ -56,7 +60,7 @@ az aks create \
     --load-balancer-sku standard \
     --enable-addons monitoring \
     --location $REGION_NAME \
-    --kubernetes-version $K8S_VERSION \
+    --kubernetes-version $AKS_K8S_VERSION \
     --network-plugin azure \
     --vnet-subnet-id $SUBNET_ID \
     --service-cidr 10.2.0.0/24 \
@@ -95,6 +99,8 @@ az aks update \
 Optionally, you can build a Docker image of your service using the az acr command, which will handle the build and push to the Azure Container Registry. Of course, you can also use any container registry. Learn more in the [official documentation](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
 
 ```bash
+CONTAINER_TAG=project-training-aks:v1.0.0
+
 az acr build \
     --registry $ACR_NAME \
     --image $CONTAINER_TAG .
@@ -181,4 +187,28 @@ spec:
   - hosts:
     - "domain-or-subdomain-herer.com" # Don't forget to change it to a valid domain or subdomain
     secretName: letsencrypt-tls
+```
+
+### Create an Azure Database for MySQL server
+If you want to learn more, access the [official documentation](https://learn.microsoft.com/en-us/azure/mysql/single-server/quickstart-create-mysql-server-database-using-azure-cli).
+
+```bash
+az mysql server create \
+    --resource-group $RESOURCE_GROUP \
+    --name $MYSQL_NAME_SERVER \
+    --location $REGION_NAME \
+    --admin-user $MYSQL_ADMIN_USER \
+    --admin-password $MYSQL_ADMIN_PASSWORD \
+    --sku-name GP_Gen5_2
+```
+
+### Create an Azure Redis caches
+If you want to learn more, access the [official documentation](https://learn.microsoft.com/en-us/cli/azure/redis?view=azure-cli-latest).
+```bash
+az redis create \
+    --location $REGION_NAME \
+    --name $REDIS_NAME_SERVER \
+    --resource-group $RESOURCE_GROUP \
+    --sku Basic \
+    --vm-size c0
 ```

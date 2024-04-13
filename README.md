@@ -5,7 +5,8 @@ Project demo for my Laravel and Kubernetes workshop with deployment on Azure Kub
 This project is a simple demo. I chose to use FrankenPHP with an app server, but alternatively, you could use RoadRunner, Swoole, or Open Swoole. In this setup, there is a Docker Compose file that initializes services locally.
 
 ## Start here
- * [Create AKS Cluster](./docs/create-aks-cluster.md)
+ * [Local Development](./docs/local-development.md)
+ * [Create Azure AKS Cluster](./docs/create-aks-cluster.md)
 
 ## Included Items
 
