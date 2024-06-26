@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: projectname-ingress
+  namespace: projectname
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "projectname.example.com"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: projectname-svc
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - "projectname.example.com"
+    secretName: letsencrypt-tls

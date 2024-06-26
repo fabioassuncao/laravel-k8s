@@ -1,0 +1,170 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: projectname
+  name: projectname
+  namespace: projectname
+spec:
+  minReadySeconds: 5
+  replicas: 3
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: projectname
+#   strategy:
+#     rollingUpdate:
+#       maxSurge: 1
+#       maxUnavailable: 50%
+#     type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: projectname
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - projectname
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      initContainers:
+        - args:
+            - /bin/bash
+            - -c
+            - (php /var/www/html/artisan config:cache || true) && (php /var/www/html/artisan view:clear || true) && (php /var/www/html/artisan migrate --force || true)
+          envFrom:
+            - configMapRef:
+                name: projectname-config
+          env:
+            - name: ENABLE_PHPFPM
+              value: "false"
+            - name: ENABLE_NGINX
+              value: "false"
+          image: ghcr.io/lighttecnologia/cartoriosmaranhao-new/central:develop
+          imagePullPolicy: Always
+          name: artisan
+          volumeMounts:
+            - mountPath: /var/www/storage
+              name: vultr-volume
+
+      containers:
+        - name: app
+          envFrom:
+            - configMapRef:
+                name: projectname-config
+          image: ghcr.io/lighttecnologia/cartoriosmaranhao-new/central:develop
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 30
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 80
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/www/storage
+              name: vultr-volume
+
+      imagePullSecrets:
+      - name: dockerconfigjson-github-com
+
+      volumes:
+          - name: vultr-volume
+            persistentVolumeClaim:
+              claimName: projectname-pvc
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: projectname-worker
+  name: projectname-worker
+  namespace: projectname
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: projectname-worker
+  template:
+    metadata:
+      labels:
+        app: projectname-worker
+    spec:
+      containers:
+        - name: projectname-worker
+          image: ghcr.io/lighttecnologia/cartoriosmaranhao-new/central:develop
+          imagePullPolicy: Always
+          command:
+            - php
+          args:
+            - artisan
+            - queue:work
+            - --queue=default
+            - --max-jobs=200
+          envFrom:
+            - configMapRef:
+                name: projectname-config
+          env:
+            - name: ENABLE_PHPFPM
+              value: "false"
+            - name: ENABLE_NGINX
+              value: "false"
+          resources: {}
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: projectname-cron
+  namespace: projectname
+spec:
+  concurrencyPolicy: Replace
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: cron
+        spec:
+          containers:
+            - args:
+                - /bin/bash
+                - -c
+                - php artisan schedule:run
+              envFrom:
+                - configMapRef:
+                    name: projectname-config
+              env:
+                - name: ENABLE_PHPFPM
+                  value: "false"
+                - name: ENABLE_NGINX
+                  value: "false"
+              image: ghcr.io/lighttecnologia/cartoriosmaranhao-new/central:develop
+              imagePullPolicy: Always
+              name: artisan-schedule
+              resources: {}
+          restartPolicy: Never
+          imagePullSecrets:
+          - name: dockerconfigjson-github-com
+  schedule: "* * * * *"
+  startingDeadlineSeconds: 30
+  successfulJobsHistoryLimit: 1
