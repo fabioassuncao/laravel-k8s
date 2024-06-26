@@ -1,58 +1,41 @@
-version: '3'
+x-function: &common_setup
+    build:
+        context: .
+        dockerfile: ./docker/Dockerfile
+    extra_hosts:
+        - 'host.docker.internal:host-gateway'
+    restart: always
+    depends_on:
+        - mysql
+        - redis
+        - mailpit
+    environment:
+        CONTAINER_ROLE: app
+        CONTAINER_MODE: automatic
+    networks:
+      - laravel
+    env_file:
+        - .env
+    volumes:
+        - .:/var/www/html
+        - ./storage/app:/var/www/html/storage/app
+        - ./storage/logs:/var/www/html/storage/logs
 
 services:
-
   app:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    restart: always
-    depends_on:
-      - mysql
-      - redis
-      - mailpit
-    environment:
-      CONTAINER_ROLE: app
-      CONTAINER_MODE: automatic
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-    volumes:
-      - .:/var/www/html
-      - ./storage:/var/www/html/storage
+    <<: *common_setup
     ports:
-      - "8000:8000"
-    networks:
-      - laravel
+      - '8000:8000'
 
   horizon:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    restart: always
-    depends_on:
-      - app
+    <<: *common_setup
     environment:
       CONTAINER_ROLE: horizon
-    volumes:
-      - .:/var/www/html
-      - ./storage:/var/www/html/storage
-    networks:
-      - laravel
 
   scheduler:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    restart: always
-    depends_on:
-      - app
+    <<: *common_setup
     environment:
       CONTAINER_ROLE: scheduler
-    volumes:
-      - .:/var/www/html
-      - ./storage:/var/www/html/storage
-    networks:
-      - laravel
 
   mysql:
     image: mysql/mysql-server:8.0
