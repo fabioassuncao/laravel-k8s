@@ -1,7 +1,7 @@
 x-function: &common_setup
     build:
         context: .
-        dockerfile: ./docker/Dockerfile
+        dockerfile: ./Dockerfile
     restart: always
     depends_on:
         - mysql
