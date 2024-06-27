@@ -2,8 +2,6 @@ x-function: &common_setup
     build:
         context: .
         dockerfile: ./docker/Dockerfile
-    extra_hosts:
-        - 'host.docker.internal:host-gateway'
     restart: always
     depends_on:
         - mysql
